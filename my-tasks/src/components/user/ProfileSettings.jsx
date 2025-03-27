@@ -12,32 +12,38 @@ const ProfileSettings = () => {
     email: ''
   });
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userData = await userService.getUserProfile(user.id);
-        setProfile({
-          fullname: userData.fullname,
-          username: userData.username,
-          email: userData.email
-        });
-      } catch (error) {
-        console.error('Failed to fetch profile', error);
-      }
-    };
-
-    fetchProfile();
-  }, [user.id]);
+    if (user?.id) {
+      const fetchProfile = async () => {
+        try {
+          const userData = await userService.getUserProfile(user.id);
+          setProfile({
+            fullname: userData.fullname || '',
+            username: userData.username || '',
+            email: userData.email || ''
+          });
+        } catch (error) {
+          console.error('Failed to fetch profile', error);
+          setError('Could not fetch profile data. Please try again later.');
+        }
+      };
+      fetchProfile();
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage('');
+    setError('');
+
     try {
       await userService.updateUserProfile(user.id, profile);
-      setMessage('Profile updated successfully');
+      setMessage('Profile updated successfully!');
     } catch (error) {
-      setMessage('Failed to update profile');
       console.error('Update profile error', error);
+      setError('Failed to update profile. Please try again.');
     }
   };
 
@@ -53,13 +59,9 @@ const ProfileSettings = () => {
       <Card>
         <Card.Header>Profile Settings</Card.Header>
         <Card.Body>
-          {message && (
-            <Alert 
-              variant={message.includes('successfully') ? 'success' : 'danger'}
-            >
-              {message}
-            </Alert>
-          )}
+          {message && <Alert variant="success">{message}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
+          
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Full Name</Form.Label>
@@ -71,6 +73,7 @@ const ProfileSettings = () => {
                 required
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
               <Form.Control
@@ -81,16 +84,17 @@ const ProfileSettings = () => {
                 required
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
                 value={profile.email}
-                onChange={handleChange}
-                required
+                readOnly // Remove this if email editing is allowed
               />
             </Form.Group>
+
             <Button variant="primary" type="submit">
               Update Profile
             </Button>

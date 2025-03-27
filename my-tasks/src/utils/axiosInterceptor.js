@@ -1,37 +1,29 @@
-// src/utils/axiosInterceptor.js
 import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8081/api', // ✅ Match your backend URL
 });
 
-// ✅ Request interceptor to add token
+// ✅ Add Authorization token before every request
 axiosInstance.interceptors.request.use(
-  config => {
+  (config) => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
-  error => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// ✅ Response interceptor to handle errors
+// ✅ Handle 401 Unauthorized responses
 axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Unauthorized! Redirecting to login...");
-      
-      // ✅ Show a message before logging out
       alert("Session expired. Please log in again.");
-
-      // ✅ Handle logout properly
-      localStorage.removeItem('accessToken');
-      window.location.href = '/login';
+      localStorage.clear();
+      window.location.href = '/login'; // Redirect to login
     }
     return Promise.reject(error);
   }

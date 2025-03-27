@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
@@ -8,45 +7,34 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  
-
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        console.log("Decoded JWT:", decoded); // ✅ Debugging role extraction
         setUser({
           id: decoded.userId,
           username: decoded.sub,
-          role: decoded.role
+          role: decoded.role || decoded.roles?.[0]?.rolename || 'USER' // ✅ Ensure role is set correctly
         });
         setIsAuthenticated(true);
       } catch (error) {
-        // Invalid token
+        console.error("Invalid token:", error);
         localStorage.clear();
       }
     }
   }, []);
 
-  const login = (userData) => {
-    localStorage.setItem('accessToken', userData.accessToken);
-    localStorage.setItem('refreshToken', userData.refreshToken);
-    setUser({
-      id: userData.userId,
-      username: userData.username,
-      role: userData.role
-    });
-    setIsAuthenticated(true);
-  };
-
   const logout = () => {
     localStorage.clear();
     setUser(null);
     setIsAuthenticated(false);
+    window.location.href = '/login';
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, setUser, setIsAuthenticated, logout }}>
       {children}
     </AuthContext.Provider>
   );

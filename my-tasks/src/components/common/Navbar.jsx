@@ -8,7 +8,8 @@ const AppNavbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.preventDefault();
     logout();
     navigate('/login');
   };
@@ -16,24 +17,28 @@ const AppNavbar = () => {
   return (
     <Navbar bg="primary" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to={
-          user?.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard'
-        }>
+        <Navbar.Brand 
+          as={Link} 
+          to={user?.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard'}
+        >
           Task Management
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
           <Nav className="ms-auto">
             {user?.role === 'ADMIN' && (
               <>
-                <Nav.Link as={Link} to="/admin/users">Users</Nav.Link>
-                <Nav.Link as={Link} to="/admin/tasks">Tasks</Nav.Link>
+                <Nav.Link as={Link} to="/admin/users">Manage Users</Nav.Link>
+                <Nav.Link as={Link} to="/admin/tasks">Manage Tasks</Nav.Link>
               </>
             )}
             {user && (
               <>
                 <Nav.Link as={Link} to="/user/profile">Profile</Nav.Link>
-                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                <Nav.Link href="#" onClick={handleLogout}>
+                  Logout
+                </Nav.Link>
               </>
             )}
           </Nav>

@@ -1,68 +1,87 @@
 // src/components/user/UserDashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { taskService } from '../../services/taskService';
 
 const UserDashboard = () => {
   const [tasks, setTasks] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [newTask, setNewTask] = useState('');
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const userTasks = await taskService.getUserTasks(user.id);
-        setTasks(userTasks);
-      } catch (error) {
-        console.error('Failed to fetch tasks', error);
-      }
-    };
+    if (user?.id) {
+      const fetchTasks = async () => {
+        try {
+          const userTasks = await taskService.getUserTasks(user.id);
+          setTasks(userTasks);
+        } catch (error) {
+          console.error('Failed to fetch tasks', error);
+        }
+      };
+      fetchTasks();
+    }
+  }, [user?.id]);
 
-    fetchTasks();
-  }, [user.id]);
-
-  const handleUpdateStatus = async (taskId, status) => {
+  const handleUpdateStatus = async (taskId, currentStatus) => {
     try {
-      await taskService.updateTaskStatus(taskId, status);
-      const updatedTasks = tasks.map(task => 
-        task.id === taskId ? { ...task, status } : task
+      const newStatus =
+        currentStatus === 'PENDING'
+          ? 'ON_PROGRESS'
+          : currentStatus === 'ON_PROGRESS'
+          ? 'COMPLETED'
+          : 'PENDING';
+
+      await taskService.updateTaskStatus(taskId, newStatus);
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+        )
       );
-      setTasks(updatedTasks);
     } catch (error) {
       console.error('Failed to update task status', error);
     }
   };
 
+  const getStatusVariant = status => {
+    switch (status) {
+      case 'PENDING':
+        return 'warning';
+      case 'ON_PROGRESS':
+        return 'info';
+      case 'COMPLETED':
+        return 'success';
+      default:
+        return 'secondary';
+    }
+  };
+
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">Welcome, {user.username}!</h2>
+      <h2 className="mb-4">Welcome, {user?.username}!</h2>
       <Row>
         <Col md={8}>
           <Card>
             <Card.Header>Your Tasks</Card.Header>
             <Card.Body>
-              {tasks.map(task => (
-                <div key={task.id} className="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
-                  <span>{task.task}</span>
-                  <div>
-                    <Button 
-                      variant={task.status === 'PENDING' ? 'warning' : 
-                               task.status === 'COMPLETED' ? 'success' : 'info'}
+              {tasks.length === 0 ? (
+                <p>No tasks assigned yet.</p>
+              ) : (
+                tasks.map(task => (
+                  <div
+                    key={task.id}
+                    className="d-flex justify-content-between align-items-center mb-3 p-2 border rounded"
+                  >
+                    <span>{task.task}</span>
+                    <Button
+                      variant={getStatusVariant(task.status)}
                       size="sm"
-                      onClick={() => {
-                        const newStatus = 
-                          task.status === 'PENDING' ? 'ON_PROGRESS' :
-                          task.status === 'ON_PROGRESS' ? 'COMPLETED' : 'PENDING';
-                        handleUpdateStatus(task.id, newStatus);
-                      }}
+                      onClick={() => handleUpdateStatus(task.id, task.status)}
                     >
-                      {task.status}
+                      {task.status.replace('_', ' ')}
                     </Button>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </Card.Body>
           </Card>
         </Col>

@@ -7,7 +7,7 @@ import { authService } from '../../services/authService';
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [newAdmin, setNewAdmin] = useState({ username: '', email: '', fullname: '', password: '' });
 
   useEffect(() => {
     fetchUsers();
@@ -31,9 +31,10 @@ const UserManagement = () => {
     }
   };
 
-  const handleCreateAdmin = async (formData) => {
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
     try {
-      await authService.registerAdmin(formData, 1); // Assuming admin ID 1
+      await authService.registerAdmin(newAdmin);
       setShowModal(false);
       fetchUsers();
     } catch (error) {
@@ -44,14 +45,7 @@ const UserManagement = () => {
   return (
     <Container className="mt-5">
       <h2 className="mb-4">User Management</h2>
-      <Button 
-        variant="primary" 
-        className="mb-3" 
-        onClick={() => {
-          setSelectedUser(null);
-          setShowModal(true);
-        }}
-      >
+      <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
         Create Admin
       </Button>
       <Table striped bordered hover>
@@ -72,11 +66,7 @@ const UserManagement = () => {
               <td>{user.email}</td>
               <td>{user.roles[0]?.rolename || 'USER'}</td>
               <td>
-                <Button 
-                  variant="danger" 
-                  size="sm"
-                  onClick={() => handleDeleteUser(user.id)}
-                >
+                <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>
                   Delete
                 </Button>
               </td>
@@ -90,31 +80,22 @@ const UserManagement = () => {
           <Modal.Title>Create Admin</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={(e) => {
-            e.preventDefault();
-            const formData = {
-              username: e.target.username.value,
-              email: e.target.email.value,
-              fullname: e.target.fullname.value,
-              password: e.target.password.value
-            };
-            handleCreateAdmin(formData);
-          }}>
+          <Form onSubmit={handleCreateAdmin}>
             <Form.Group className="mb-3">
               <Form.Label>Full Name</Form.Label>
-              <Form.Control type="text" name="fullname" required />
+              <Form.Control type="text" required value={newAdmin.fullname} onChange={(e) => setNewAdmin({ ...newAdmin, fullname: e.target.value })} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
-              <Form.Control type="text" name="username" required />
+              <Form.Control type="text" required value={newAdmin.username} onChange={(e) => setNewAdmin({ ...newAdmin, username: e.target.value })} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" name="email" required />
+              <Form.Control type="email" required value={newAdmin.email} onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" name="password" required />
+              <Form.Control type="password" required value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} />
             </Form.Group>
             <Button variant="primary" type="submit">
               Create Admin

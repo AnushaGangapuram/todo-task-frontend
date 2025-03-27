@@ -1,29 +1,37 @@
 // src/components/admin/AdminDashboard.jsx
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Table } from 'react-bootstrap';
-import { useAuth } from '../../context/AuthContext';
-import { userService } from '../../services/userService';
-import { taskService } from '../../services/taskService';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Card, Table, Spinner } from "react-bootstrap";
+import { useAuth } from "../../context/AuthContext";
+import { userService } from "../../services/userService";
+import { taskService } from "../../services/taskService";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ Loading state
+  const [error, setError] = useState(null); // ✅ Error state
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userList = await userService.getAllUsers();
-        const taskList = await userService.getAllTasks();
+        const taskList = await taskService.getAllTasks();
         setUsers(userList);
         setTasks(taskList);
       } catch (error) {
-        console.error('Failed to fetch data', error);
+        console.error("Failed to fetch data", error);
+        setError("Failed to load data.");
+      } finally {
+        setLoading(false); // ✅ Always stop loading
       }
     };
 
     fetchData();
   }, []);
+
+  if (loading) return <Spinner animation="border" />;
+  if (error) return <p className="text-danger">{error}</p>;
 
   return (
     <Container className="mt-5">
@@ -35,7 +43,7 @@ const AdminDashboard = () => {
             <Card.Body>
               <p>Total Users: {users.length}</p>
               <p>Total Tasks: {tasks.length}</p>
-              <p>Active Users: {users.filter(u => u.enabled).length}</p>
+              <p>Active Users: {users.filter((u) => u.enabled).length}</p>
             </Card.Body>
           </Card>
         </Col>
@@ -52,11 +60,11 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.slice(0, 5).map(u => (
+                  {users.slice(0, 5).map((u) => (
                     <tr key={u.id}>
                       <td>{u.username}</td>
                       <td>{u.email}</td>
-                      <td>{u.roles[0]?.rolename || 'USER'}</td>
+                      <td>{u.roles[0]?.rolename || "USER"}</td>
                     </tr>
                   ))}
                 </tbody>
