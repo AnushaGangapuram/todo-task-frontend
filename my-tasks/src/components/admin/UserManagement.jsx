@@ -33,14 +33,22 @@ const UserManagement = () => {
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
+    
+    if (!newAdmin.username || !newAdmin.email || !newAdmin.fullname || !newAdmin.password) {
+      alert("⚠️ Please fill in all fields.");
+      return;
+    }
+  
     try {
       await authService.registerAdmin(newAdmin);
+      alert("✅ Admin created successfully!");
       setShowModal(false);
       fetchUsers();
     } catch (error) {
-      console.error('Failed to create admin', error);
+      console.error("❌ Failed to create admin:", error);
     }
   };
+  
 
   return (
     <Container className="mt-5">
