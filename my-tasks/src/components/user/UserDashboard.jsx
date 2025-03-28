@@ -1,20 +1,17 @@
-// src/components/user/UserDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
-
 import { taskService } from '../../services/taskService';
-
 
 const UserDashboard = () => {
   const [tasks, setTasks] = useState([]);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.userId) { // ✅ Ensure correct field
       const fetchTasks = async () => {
         try {
-          const userTasks = await taskService.getUserTasks(user.id);
+          const userTasks = await taskService.getUserTasks(user.userId);
           setTasks(userTasks);
         } catch (error) {
           console.error('Failed to fetch tasks', error);
@@ -22,7 +19,7 @@ const UserDashboard = () => {
       };
       fetchTasks();
     }
-  }, [user?.id]);
+  }, [user?.userId]);
 
   const handleUpdateStatus = async (taskId, currentStatus) => {
     try {

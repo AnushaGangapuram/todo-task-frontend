@@ -1,4 +1,4 @@
-import axiosInstance from '../utils/axiosInterceptor';  // Importing the axios instance with interceptors
+import axiosInstance from '../utils/axiosInterceptor';
 
 export const taskService = {
   // ✅ Fetch all tasks (Admin Only)
@@ -12,10 +12,10 @@ export const taskService = {
     }
   },
 
-  // ✅ Fetch tasks assigned to a specific user (Admin Only)
+  // ✅ Fetch tasks assigned to a specific user (User Only)
   getUserTasks: async (userId) => {
     try {
-      const response = await axiosInstance.get(`/admin/tasks/assigned/${userId}`);
+      const response = await axiosInstance.get(`/user/tasks/${userId}`); // ✅ Corrected API path
       return response.data;
     } catch (error) {
       console.error("Error fetching user tasks:", error);
@@ -26,7 +26,7 @@ export const taskService = {
   // ✅ Create or assign a new task (Admin Only)
   createOrAssignTask: async (taskData) => {
     try {
-      const response = await axiosInstance.post('/admin/tasks/assign', taskData);  // Using correct endpoint for task assignment
+      const response = await axiosInstance.post('/admin/tasks/assign', taskData);
       return response.data;
     } catch (error) {
       console.error("Error creating or assigning task:", error);
@@ -37,7 +37,7 @@ export const taskService = {
   // ✅ Update task status (User Only)
   updateTaskStatus: async (taskId, newStatus) => {
     try {
-      const response = await axiosInstance.put(`/user/tasks/${taskId}/status`, { status: newStatus });
+      const response = await axiosInstance.put(`/user/tasks/${taskId}/status`, { status: newStatus }); // ✅ Corrected API path
       return response.data;
     } catch (error) {
       console.error("Error updating task status:", error);
