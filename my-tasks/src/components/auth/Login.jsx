@@ -14,87 +14,105 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Login.jsx
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(null); // Reset previous errors
-  try {
-    const response = await authService.login(formData.username, formData.password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      const response = await authService.login(formData.username, formData.password);
 
-    // Store accessToken and refreshToken in localStorage separately
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
 
-    // Also store the user data for future reference if needed
-    const user = {
-      userId: response.userId,
-      username: response.username,
-      role: response.role
-    };
-    localStorage.setItem('user', JSON.stringify(user));
+      const user = {
+        userId: response.userId,
+        username: response.username,
+        role: response.role
+      };
+      localStorage.setItem('user', JSON.stringify(user));
 
-    // Update Auth Context
-    setUser(user);
-    setIsAuthenticated(true);
+      setUser(user);
+      setIsAuthenticated(true);
 
-    // Navigate based on role
-    if (response.role === 'ADMIN') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/user/dashboard');
+      if (response.role === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/user/dashboard');
+      }
+    } catch (error) {
+      setError('Invalid credentials. Please try again.');
+      console.error('Login error:', error);
     }
-  } catch (error) {
-    setError('Invalid credentials. Please try again.');
-    console.error('Login error:', error);
-  }
-};
+  };
 
-  
   const handleRegisterClick = () => {
-    navigate('/register'); // Navigate to the registration page
+    navigate('/register');
   };
 
   return (
-    <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-      <Row className="w-100">
-        <Col xs={12} md={6} lg={4} className="mx-auto">
-          <Card className="shadow-lg">
-            <Card.Header className="text-center bg-primary text-white">Login</Card.Header>
-            <Card.Body>
-              {error && <Alert variant="danger">{error}</Alert>}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter your username"
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter your password"
-                  />
-                </Form.Group>
-                <Button variant="primary" type="submit" className="w-100">Login</Button>
-              </Form>
-              <div className="mt-3 text-center">
-                <p>Don't have an account? <Button variant="link" onClick={handleRegisterClick}>Register</Button></p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+    <div 
+      style={{
+        height: '100vh',
+        width: '100%',
+        background: 'linear-gradient(to right, #e3f2fd, #ffffff)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}
+    >
+      <Container>
+        <Row className="w-100">
+          <Col xs={12} md={6} lg={4} className="mx-auto">
+            <Card className="shadow-lg rounded-3 border-0">
+              <Card.Header className="text-center bg-primary text-white fw-bold" style={{ fontSize: '1.4rem' }}>
+                Welcome Back!
+              </Card.Header>
+              <Card.Body className="p-4">
+                <p className="text-center text-muted">Please login to continue</p>
+
+                {error && <Alert variant="danger" className="text-center">{error}</Alert>}
+
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your username"
+                      className="rounded-2"
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your password"
+                      className="rounded-2"
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit" className="w-100 rounded-2 fw-bold" style={{ fontSize: '1.1rem' }}>
+                    Login
+                  </Button>
+                </Form>
+
+                <div className="mt-3 text-center">
+                  <p className="mb-1 text-muted">Don't have an account?</p>
+                  <Button variant="link" onClick={handleRegisterClick} className="fw-bold">
+                    Register Here
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 };
 

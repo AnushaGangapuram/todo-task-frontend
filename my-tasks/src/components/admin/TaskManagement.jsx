@@ -9,6 +9,7 @@ const TaskManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [newTask, setNewTask] = useState({ task: '', assignedTo: '' });
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchTasks();
@@ -37,7 +38,9 @@ const TaskManagement = () => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       try {
         await taskService.deleteTask(taskId);
+        setSuccessMessage('Task deleted successfully!');
         fetchTasks();
+        setTimeout(() => setSuccessMessage(''), 3000);
       } catch (error) {
         setError('Failed to delete task. Please try again.');
       }
@@ -46,41 +49,47 @@ const TaskManagement = () => {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-  
+
     if (!newTask.assignedTo) {
       setError('Please select a user.');
       return;
     }
-  
+
     const taskData = {
       task: newTask.task,
       userId: newTask.assignedTo,
       status: 'PENDING',
     };
-  
+
     try {
-      await taskService.createOrAssignTask(taskData); // ✅ Correct function name
+      await taskService.createOrAssignTask(taskData);
+      setSuccessMessage('Task assigned successfully!');
       setShowModal(false);
       fetchTasks();
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create task. Please try again.');
     }
   };
-  
 
   return (
     <Container className="mt-5">
       <h2 className="mb-4">Task Management</h2>
+
+      {/* ✅ Show Success & Error Messages */}
+      {successMessage && <Alert variant="success">{successMessage}</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
+
       <Button variant="primary" className="mb-3" onClick={() => setShowModal(true)}>
         Create Task
       </Button>
+
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>ID</th>
             <th>Task</th>
-            <th>Assigned To (User ID)</th> {/* ✅ Changed from username to user_id */}
+            <th>Assigned To (Username)</th> {/* ✅ Updated to show username */}
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -90,7 +99,7 @@ const TaskManagement = () => {
             <tr key={task.id}>
               <td>{task.id}</td>
               <td>{task.task}</td>
-              <td>{task.user?.id || 'Unassigned'}</td> {/* ✅ Displaying user_id */}
+              <td>{task.user?.username || 'Unassigned'}</td> {/* ✅ Display username instead of userId */}
               <td>{task.status}</td>
               <td>
                 <Button variant="danger" size="sm" onClick={() => handleDeleteTask(task.id)}>
@@ -102,6 +111,7 @@ const TaskManagement = () => {
         </tbody>
       </Table>
 
+      {/* ✅ Task Creation Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Create Task</Modal.Title>
@@ -128,7 +138,7 @@ const TaskManagement = () => {
                 <option value="">Select User</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
-                    {user.id} {/* ✅ Displaying user_id in dropdown */}
+                    {user.username} {/* ✅ Show username instead of userId */}
                   </option>
                 ))}
               </Form.Control>

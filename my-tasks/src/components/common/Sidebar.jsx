@@ -1,4 +1,3 @@
-// src/components/common/Sidebar.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Offcanvas, Button, Nav } from 'react-bootstrap';
@@ -15,77 +14,38 @@ const Sidebar = () => {
       {/* Sidebar Toggle Button */}
       <Button 
         variant="primary" 
-        className="m-3" 
+        className="sidebar-toggle-btn"
         onClick={toggleSidebar}
-        style={{
-          borderRadius: '50%', 
-          width: '50px', 
-          height: '50px', 
-          fontSize: '24px', 
-          padding: '0', 
-          backgroundColor: '#007bff', 
-          border: 'none'
-        }}
       >
         ☰
       </Button>
 
-      {/* Bootstrap Offcanvas Sidebar */}
-      <Offcanvas show={show} onHide={toggleSidebar} backdrop="true" placement="start" style={{ width: '250px' }}>
+      {/* Sidebar Offcanvas */}
+      <Offcanvas show={show} onHide={toggleSidebar} backdrop="true" placement="start" className="custom-sidebar">
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Navigation</Offcanvas.Title>
+          <Offcanvas.Title className="sidebar-title">Navigation</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <Nav className="flex-column" style={{ paddingTop: '20px' }}>
+          <Nav className="flex-column">
             {/* Admin Links */}
             {user?.role === 'ADMIN' ? (
               <>
-                <Nav.Link 
-                  as={Link} 
-                  to="/admin/dashboard" 
-                  onClick={toggleSidebar}
-                  style={{ fontWeight: 'bold', fontSize: '18px', padding: '10px 15px' }}
-                  className="sidebar-nav-item"
-                >
+                <Nav.Link as={Link} to="/admin/dashboard" onClick={toggleSidebar} className="sidebar-item">
                   📊 Admin Dashboard
                 </Nav.Link>
-                <Nav.Link 
-                  as={Link} 
-                  to="/admin/users" 
-                  onClick={toggleSidebar}
-                  style={{ fontWeight: 'bold', fontSize: '18px', padding: '10px 15px' }}
-                  className="sidebar-nav-item"
-                >
+                <Nav.Link as={Link} to="/admin/users" onClick={toggleSidebar} className="sidebar-item">
                   👥 Manage Users
                 </Nav.Link>
-                <Nav.Link 
-                  as={Link} 
-                  to="/admin/tasks" 
-                  onClick={toggleSidebar}
-                  style={{ fontWeight: 'bold', fontSize: '18px', padding: '10px 15px' }}
-                  className="sidebar-nav-item"
-                >
+                <Nav.Link as={Link} to="/admin/tasks" onClick={toggleSidebar} className="sidebar-item">
                   ✅ Manage Tasks
                 </Nav.Link>
               </>
             ) : (
               <>
-                <Nav.Link 
-                  as={Link} 
-                  to="/user/dashboard" 
-                  onClick={toggleSidebar}
-                  style={{ fontWeight: 'bold', fontSize: '18px', padding: '10px 15px' }}
-                  className="sidebar-nav-item"
-                >
+                <Nav.Link as={Link} to="/user/dashboard" onClick={toggleSidebar} className="sidebar-item">
                   🏠 My Tasks
                 </Nav.Link>
-                <Nav.Link 
-                  as={Link} 
-                  to="/user/profile" 
-                  onClick={toggleSidebar}
-                  style={{ fontWeight: 'bold', fontSize: '18px', padding: '10px 15px' }}
-                  className="sidebar-nav-item"
-                >
+                <Nav.Link as={Link} to="/user/profile" onClick={toggleSidebar} className="sidebar-item">
                   ⚙ Profile Settings
                 </Nav.Link>
               </>
@@ -96,23 +56,49 @@ const Sidebar = () => {
 
       {/* Sidebar Custom Styles */}
       <style jsx>{`
-        .sidebar-nav-item {
-          border-bottom: 1px solid #ddd;
-          transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        .sidebar-nav-item:hover {
-          background-color: #f8f9fa;
-          color: #007bff;
+        .sidebar-toggle-btn {
+          position: fixed;
+          top: 15px;
+          left: 15px;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          font-size: 22px;
+          padding: 0;
+          background: #007bff;
+          border: none;
+          color: white;
+          transition: 0.3s;
         }
 
-        .offcanvas-header {
-          background-color: #343a40;
+        .sidebar-toggle-btn:hover {
+          background: #0056b3;
+        }
+
+        .custom-sidebar {
+          width: 260px;
+          background: #343a40;
+          color: white;
+        }
+
+        .sidebar-title {
+          font-weight: bold;
+          font-size: 20px;
           color: #fff;
         }
 
-        .offcanvas-body {
-          background-color: #f1f1f1;
+        .sidebar-item {
+          font-size: 18px;
+          padding: 12px 15px;
+          font-weight: 500;
+          color: #ddd;
+          transition: all 0.3s ease;
+        }
+
+        .sidebar-item:hover {
+          background: #007bff;
+          color: #fff;
+          border-radius: 5px;
         }
       `}</style>
     </>

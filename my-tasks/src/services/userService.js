@@ -29,10 +29,11 @@ export const userService = {
       const response = await axiosInstance.delete(`/admin/users/${userId}`);
       return response.data;
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error deleting user:", error.response?.data || error.message);
       throw error;
     }
   },
+  
 
   // ✅ Fetch user profile data
   getUserProfile: async (userId) => {
