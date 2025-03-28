@@ -8,20 +8,25 @@ const axiosInstance = axios.create({
 // ✅ Attach Authorization token before each request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    // Get the token from localStorage or sessionStorage
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    
     if (token) {
+      // If token exists, add it to the Authorization header
       config.headers['Authorization'] = `Bearer ${token}`;
-    } else {
-      console.warn("⚠️ No access token found in localStorage.");
     }
+    
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
+
 
 // ✅ Handle authentication & authorization errors
 axiosInstance.interceptors.response.use(
-  (response) => response, // Return response if no error
+  (response) => response, 
   (error) => {
     if (error.response) {
       const status = error.response.status;
@@ -29,9 +34,7 @@ axiosInstance.interceptors.response.use(
       if (status === 401) {
         alert("🔒 Session expired. Please log in again.");
         localStorage.clear();
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login"; // Redirect only if not already on login page
-        }
+        window.location.href = "/login"; // Redirect to login page
       } else if (status === 403) {
         alert("🚫 You are not authorized to perform this action.");
       } else {

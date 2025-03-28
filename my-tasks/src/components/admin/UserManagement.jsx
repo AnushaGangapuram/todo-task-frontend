@@ -31,23 +31,28 @@ const UserManagement = () => {
     }
   };
 
-  const handleCreateAdmin = async (e) => {
-    e.preventDefault();
-    
-    if (!newAdmin.username || !newAdmin.email || !newAdmin.fullname || !newAdmin.password) {
-      alert("⚠️ Please fill in all fields.");
-      return;
-    }
-  
-    try {
-      await authService.registerAdmin(newAdmin);
-      alert("✅ Admin created successfully!");
-      setShowModal(false);
-      fetchUsers();
-    } catch (error) {
-      console.error("❌ Failed to create admin:", error);
-    }
-  };
+  // UserManagement.jsx
+const handleCreateAdmin = async (e) => {
+  e.preventDefault();
+
+  if (!newAdmin.username || !newAdmin.email || !newAdmin.fullname || !newAdmin.password) {
+    alert("⚠️ Please fill in all fields.");
+    return;
+  }
+
+  // Get the logged-in user ID from localStorage
+  const loggedInUser = JSON.parse(localStorage.getItem('user'));
+
+  try {
+    await authService.registerAdmin(newAdmin, loggedInUser.userId); // Pass the adminId
+    alert("✅ Admin created successfully!");
+    setShowModal(false);
+    fetchUsers(); // Fetch the updated user list
+  } catch (error) {
+    console.error("❌ Failed to create admin:", error);
+  }
+};
+
   
 
   return (

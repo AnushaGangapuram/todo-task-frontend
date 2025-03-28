@@ -1,4 +1,4 @@
-import axiosInstance from '../utils/axiosInterceptor';
+import axiosInstance from '../utils/axiosInterceptor';  // Importing the axios instance with interceptors
 
 export const taskService = {
   // ✅ Fetch all tasks (Admin Only)
@@ -8,40 +8,29 @@ export const taskService = {
       return response.data;
     } catch (error) {
       console.error("Error fetching all tasks:", error);
-      throw error;
+      throw new Error(`Failed to fetch tasks: ${error.response?.data?.message || error.message}`);
     }
   },
 
-  // ✅ Fetch tasks assigned to a specific user
+  // ✅ Fetch tasks assigned to a specific user (Admin Only)
   getUserTasks: async (userId) => {
     try {
-      const response = await axiosInstance.get(`/admin/tasks/${userId}`);
+      const response = await axiosInstance.get(`/admin/tasks/assigned/${userId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching user tasks:", error);
-      throw error;
+      throw new Error(`Failed to fetch user tasks: ${error.response?.data?.message || error.message}`);
     }
   },
 
-  // ✅ Create a new task (Admin Only) 🟢 [FIXED: Function Added]
-  createTask: async (taskData) => {
+  // ✅ Create or assign a new task (Admin Only)
+  createOrAssignTask: async (taskData) => {
     try {
-      const response = await axiosInstance.post('/admin/tasks', taskData);
+      const response = await axiosInstance.post('/admin/tasks/assign', taskData);  // Using correct endpoint for task assignment
       return response.data;
     } catch (error) {
-      console.error("Error creating task:", error);
-      throw error;
-    }
-  },
-
-  // ✅ Assign a new task (Admin Only)
-  assignTask: async (taskData) => {
-    try {
-      const response = await axiosInstance.post('/admin/tasks/assign', taskData);
-      return response.data;
-    } catch (error) {
-      console.error("Error assigning task:", error);
-      throw error;
+      console.error("Error creating or assigning task:", error);
+      throw new Error(`Failed to create or assign task: ${error.response?.data?.message || error.message}`);
     }
   },
 
@@ -52,7 +41,7 @@ export const taskService = {
       return response.data;
     } catch (error) {
       console.error("Error updating task status:", error);
-      throw error;
+      throw new Error(`Failed to update task status: ${error.response?.data?.message || error.message}`);
     }
   },
 
@@ -63,7 +52,7 @@ export const taskService = {
       return response.data;
     } catch (error) {
       console.error("Error deleting task:", error);
-      throw error;
+      throw new Error(`Failed to delete task: ${error.response?.data?.message || error.message}`);
     }
   }
 };

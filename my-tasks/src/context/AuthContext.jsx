@@ -8,21 +8,26 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+
+      // Optionally, you can decode the token to verify it or extract more info if necessary
       try {
-        const decoded = jwtDecode(token);
-        console.log("Decoded JWT:", decoded); // ✅ Debugging role extraction
+        const decoded = jwtDecode(parsedUser.accessToken);
+        console.log("Decoded JWT:", decoded); // Debugging role extraction
+        
         setUser({
-          id: decoded.userId,
-          username: decoded.sub,
-          role: decoded.role || decoded.roles?.[0]?.rolename || 'USER' // ✅ Ensure role is set correctly
+          id: parsedUser.userId,
+          username: parsedUser.username,
+          role: parsedUser.role || 'USER', // Set 'USER' as a fallback role if it's missing
         });
+
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Invalid token:", error);
         localStorage.clear();
-        setIsAuthenticated(false); // Make sure user is unauthenticated after error
+        setIsAuthenticated(false);
       }
     }
   }, []);
